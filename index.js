@@ -1,5 +1,7 @@
 const https = require('https')
 const fs = require('fs')
+const { rejects } = require('assert')
+const { resolve } = require('path')
 // Recibir por la línea de comando
 const [, , nombreArchivo, extensionArchivo, divisa, cantidad] = process.argv
 
@@ -10,45 +12,46 @@ const nombreArchivoExtension = (archivo, extension) => `${archivo}.${extension}`
 // Consultar API
 const obtenerDatos = (divisa, cantidad) => {
   const URL_BASE = 'https://mindicador.cl/api'
+  // retorna una promesa
+  return new Promise((resolve, reject) => {
+    https.get(URL_BASE, (res) => {
+      // usar end() en casos de mucha data
+      res
+        .on('data', (data) => {
+          const newData = JSON.parse(data)
 
-  //   const valores = await https.get(URL_BASE, (res) => {
-  https.get(URL_BASE, (res) => {
-    res
-      .on('data', (data) => {
-        const newData = JSON.parse(data)
-
-        if (!Object.keys(newData).includes(divisa)) {
-          throw new Error('Divisa no encontrada')
-        }
-        const valor = cantidad / newData[`${divisa}`].valor
-        //   return valor
-
-        // Crea archivo
-        fs.writeFile(
-          nombreArchivoExtension(nombreArchivo, extensionArchivo),
-          'A la fecha:' +
-            Date() +
-            '\n' +
-            'Fue realizada cotización con los siguientes datos:' +
-            '\n' +
-            'Cantidad de pesos a convertir: ' +
-            cantidad +
-            '\n' +
-            'Convertido a ' +
-            divisa +
-            'da un total de: ' +
-            valor +
-            '\n',
-          'utf8',
-          () => {
-            console.log('Archivo creado con éxito')
+          if (!Object.keys(newData).includes(divisa)) {
+            reject(new Error('Divisa no encontrada'))
           }
-        )
-        // lee archivo y muestra por consolsa
-      })
-      .on('error', (err) => {
-        console.log(err.message)
-      })
+          const valor = cantidad / newData[`${divisa}`].valor
+          resolve(valor)
+
+          // Crea archivo --> Se debe colocar en otra funcion
+          fs.writeFile(
+            nombreArchivoExtension(nombreArchivo, extensionArchivo),
+            'A la fecha:' +
+              Date() +
+              '\n' +
+              'Fue realizada cotización con los siguientes datos:' +
+              '\n' +
+              'Cantidad de pesos a convertir: ' +
+              cantidad +
+              '\n' +
+              'Convertido a ' +
+              divisa +
+              'da un total de: ' +
+              valor +
+              '\n',
+            'utf8',
+            () => {
+              console.log('Archivo creado con éxito')
+            }
+          )
+        })
+        .on('error', (err) => {
+          console.log(err.message)
+        })
+    })
   })
 
   //   console.log(valores)
@@ -57,24 +60,15 @@ const obtenerDatos = (divisa, cantidad) => {
 
 console.log(obtenerDatos(divisa, cantidad))
 
-// obtenerDatos(divisa, cantidad)
-// .then((err, res) => {
-//   if (err) {
-//     console.log(err.message)
-//   }
-//   console.log(res)
-// })
+// llamar a write file aqui
 
-// const main = async () => {
-//   const result = await obtenerDatos(divisa, cantidad)
-//   console.log(result)
-//   return result
-// }
+const main = async () => {
+  try {
+    const result = await obtenerDatos(divisa, cantidad)
+    console.log(result)
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 
-// main()
-// console.log(obtenerDatos(divisa, cantidad))
-
-// console.log(nombreArchivo)
-// console.log(extensionArchivo)
-// console.log(divisa)
-// console.log(cantidad)
+main()

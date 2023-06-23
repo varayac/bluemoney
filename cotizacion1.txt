@@ -1,0 +1,4 @@
+A la fecha:Thu Jun 22 2023 23:37:22 GMT-0400 (Chile Standard Time)
+Fue realizada cotización con los siguientes datos:
+Cantidad de pesos a convertir: 10000
+Convertido a dolarda un total de: 12.470382840753212
