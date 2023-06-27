@@ -29,14 +29,9 @@ const calcularDivisa = (dataObtenida) => {
       reject(new Error('Divisa no encontrada'))
     }
 
+    // Monto en CLP / Tasa de cambio = Monto en en otra moneda.
     const valorConversion = pesos / dataObtenida[tipoDivisa].valor
     resolve(valorConversion)
-    /* let valor = 0
-     if (divisa == 'dolar') {
-       valor = cantidad / newData[divisa].valor
-     }
-
-     console.log(valor) */
   })
 }
 
