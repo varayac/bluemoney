@@ -2,12 +2,8 @@ const https = require('https')
 const fs = require('fs')
 
 // Recibir datos por línea de comando
-//const [, , archivo, extension, tipoDivisa, cantidadPesos] = process.argv
 const [, , nombreArchivo, tipoDivisa, cantidadPesos] = process.argv
 const pesos = Number(cantidadPesos)
-
-// Concatenar nombre de archivo y extensión
-//const nombreArchivo = (archivo, ext) => `${archivo}.${ext}`
 
 // Consultar API
 const obtenerDatos = () => {
@@ -47,7 +43,6 @@ const calcularDivisa = (dataObtenida) => {
 // Crear cotización
 const crearCotizacion = (totalConversion) => {
   fs.writeFile(
-    //`${nombreArchivo(archivo, extension)}`,
     `${nombreArchivo}`,
     `A la fecha: ${Date()} \n` +
       `Fue realizada cotización con los siguientes datos: \n` +
@@ -55,7 +50,6 @@ const crearCotizacion = (totalConversion) => {
       `Convertido a '${tipoDivisa}' da un total de: ${totalConversion.toFixed(2)}`,
     'utf8',
     () => {
-      //console.log(`Archivo ${nombreArchivo(archivo, extension)} creado con éxito`)
       console.log(`Archivo ${nombreArchivo} creado con éxito`)
     }
   )
