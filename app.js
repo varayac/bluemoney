@@ -1,9 +1,11 @@
 const https = require('https')
 const fs = require('fs')
 
-// Recibir por línea de comando
+// Recibir datos por línea de comando
 //const [, , archivo, extension, tipoDivisa, cantidadPesos] = process.argv
 const [, , nombreArchivo, tipoDivisa, cantidadPesos] = process.argv
+const pesos = Number(cantidadPesos)
+
 // Concatenar nombre de archivo y extensión
 //const nombreArchivo = (archivo, ext) => `${archivo}.${ext}`
 
@@ -31,9 +33,8 @@ const calcularDivisa = (dataObtenida) => {
       reject(new Error('Divisa no encontrada'))
     }
 
-    const valorConversion = cantidadPesos / dataObtenida[tipoDivisa].valor
+    const valorConversion = pesos / dataObtenida[tipoDivisa].valor
     resolve(valorConversion)
-
     /* let valor = 0
      if (divisa == 'dolar') {
        valor = cantidad / newData[divisa].valor
@@ -50,7 +51,7 @@ const crearCotizacion = (totalConversion) => {
     `${nombreArchivo}`,
     `A la fecha: ${Date()} \n` +
       `Fue realizada cotización con los siguientes datos: \n` +
-      `Cantidad de pesos a convertir: $${cantidadPesos} pesos \n` +
+      `Cantidad de pesos a convertir: $${pesos.toLocaleString('ES-cl')} pesos \n` +
       `Convertido a '${tipoDivisa}' da un total de: ${totalConversion.toFixed(2)}`,
     'utf8',
     () => {
@@ -60,16 +61,20 @@ const crearCotizacion = (totalConversion) => {
   )
 }
 
+const crearRespaldoHistorico = () => {
+  fs.writeFile(``)
+}
+
 // LEER ARCHIVO
 const leerArchivo = () => {
   return new Promise((resolv, reject) => {
-      fs.readFile(nombreArchivo, 'utf8', (err, data) => {
-          if (err) {
-              reject('Error al leer archivo');
-          }
-          resolv(data);
-      });
-  });
+    fs.readFile(nombreArchivo, 'utf8', (err, data) => {
+      if (err) {
+        reject('Error al leer archivo')
+      }
+      resolv(data)
+    })
+  })
 }
 
 const main = async () => {
@@ -77,10 +82,9 @@ const main = async () => {
     const dataObtenida = await obtenerDatos()
     const totalConversion = await calcularDivisa(dataObtenida)
     crearCotizacion(totalConversion)
-    const respuesta = await leerArchivo();
-    console.log(respuesta);
-  } 
-  catch (error) {
+    const respuesta = await leerArchivo()
+    console.log(respuesta)
+  } catch (error) {
     console.log(error.message)
   }
 }
